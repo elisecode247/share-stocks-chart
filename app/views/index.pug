@@ -2,20 +2,18 @@ extends layout
 block page
   div.jumbotron.container
     div.page-header
-      h1 Stock Market 
-        small Compare Stocks Over Time
+      h1 Stock Prices Comparison
     div.row
       div.card.col-xs-12#chart-container
     div#companies.row
       form#search-form.form.card.col-xs-12(action="")
-        h2 Search
-        label(for="search-input") Syncs in realtime across clients
+        label(for="search-input") Syncs in real-time across clients
         div.input-group
-          input#search-input.form-control(type="text", autocomplete="off", placeholder="Stock code")
+          input#search-input.form-control(type="text", autocomplete="off", placeholder="Search by ticker symbol")
           span.input-group-btn
             button.btn.btn-secondary(type="submit") Add
     footer
-      | @elisecode247
+      a(href="https://github.com/elisecode247/share-stocks-chart") @elisecode247
 block scripts
   script(src="https://cdn.socket.io/socket.io-1.2.0.js")
   script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js", integrity="sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7", crossorigin="anonymous")

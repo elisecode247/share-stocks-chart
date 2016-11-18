@@ -26,7 +26,6 @@ socket.on('new', function(data) {
 });
 
 socket.on('add company', function(data) {
-    console.log('data' + data);
     if (data !== 'error') {
         addCompany(data);
     }
@@ -37,13 +36,13 @@ socket.on('add company', function(data) {
 });
 
 socket.on('delete company', function(symbol) {
-    $('button[data-company="' + symbol +'"]').parent().remove();
-    var index = seriesOptions.findIndex(function(obj){
+    $('button[data-company="' + symbol + '"]').parent().remove();
+    var index = seriesOptions.findIndex(function(obj) {
         return obj.name === symbol;
     });
-    seriesOptions.splice(index,1);
+    seriesOptions.splice(index, 1);
     chart.series[index].remove();
-    names.splice(names.indexOf(symbol),1);
+    names.splice(names.indexOf(symbol), 1);
 });
 
 function addCompany(myData) {
@@ -62,10 +61,10 @@ function addCompany(myData) {
 }
 
 function createCard(symbol, name) {
-    $('#companies').prepend('<div class="card card-block col-sm-6"><button data-company="'+ symbol + '" class="closeCard"' +
+    $('#companies').prepend('<div class="card card-block col-sm-6"><button data-company="' + symbol + '" class="btn btn-sm closeCard"' +
         '>X</button><h3>' +
         symbol + '</h3><p>' + name + '</p></div>');
-    $('button[data-company="' + symbol +'"]').on("click", function() {
+    $('button[data-company="' + symbol + '"]').on("click", function() {
         socket.emit('delete company', symbol);
     });
 }

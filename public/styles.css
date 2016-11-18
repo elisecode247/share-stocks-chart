@@ -1,1 +1,1 @@
-#search-form{background-color:SeaGreen}.vertical-center{min-height:100%;min-height:100vh;display:flex;align-items:center}footer{text-align:center}#chart-container{width:100%}.closeCard{position:absolute;right:5px;top:5px}
+.vertical-center{min-height:100%;min-height:100vh;display:flex;align-items:center}label{margin-top:5px}footer{text-align:center}#chart-container{width:100%}.card{padding-bottom:5px}.closeCard{position:absolute;right:5px;top:5px;background-color:#ffe6e6}.btn-secondary{background-color:#e6ffe6}

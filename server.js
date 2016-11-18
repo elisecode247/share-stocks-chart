@@ -42,7 +42,6 @@ io.on('connection', function(socket) {
       '&order=asc&column_index=1&api_key=B4_x1rzypeW4D7N797RK';
     request(apiUrl, function(error, response, body) {
       if (error) throw error;
-      console.log('status code' + response.statusCode);
       if (response.statusCode === 200) {
         var jsonObj = JSON.parse(body)
         appendObject(jsonObj.dataset.dataset_code)
@@ -54,7 +53,6 @@ io.on('connection', function(socket) {
     });
   });
   socket.on('delete company', function(company) {
-    console.log('company: ' + company);
     pullCompany(company);
     io.emit('delete company', company);
   });
@@ -68,17 +66,13 @@ http.listen(process.env.PORT, function() {
 function appendObject(str) {
   jsonfile.readFile(file, function(err, data) {
     if (err) throw err;
-    if (data.companies.indexOf(str) > -1) {
-      // do nothing
-    }
-    else {
+    if (data.companies.indexOf(str) !== -1) {
       data.companies.push(str);
       jsonfile.writeFile(file, data, function(err) {
         console.error(err);
       });
     }
   });
-
 }
 
 function pullCompany(str) {
@@ -87,12 +81,11 @@ function pullCompany(str) {
     if (err) throw err;
     var found = arr.indexOf(str);
     if (found !== -1) {
-        arr.splice(found, 1);
+      arr.splice(found, 1);
     }
-    console.log('data: ' + data);
-          jsonfile.writeFile(file, data, function(err) {
-        console.error(err);
-      });
+    jsonfile.writeFile(file, data, function(err) {
+      console.error(err);
+    });
   });
 
 }

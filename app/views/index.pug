@@ -1,0 +1,27 @@
+extends layout
+block page
+  div.jumbotron.container
+    div.page-header
+      h1 Stock Market 
+        small Compare Stocks Over Time
+    div.row
+      div.card.col-xs-12#chart-container
+    div#companies.row
+      form#search-form.form.card.col-xs-12(action="")
+        h2 Search
+        label(for="search-input") Syncs in realtime across clients
+        div.input-group
+          input#search-input.form-control(type="text", autocomplete="off", placeholder="Stock code")
+          span.input-group-btn
+            button.btn.btn-secondary(type="submit") Add
+    footer
+      | @elisecode247
+block scripts
+  script(src="https://cdn.socket.io/socket.io-1.2.0.js")
+  script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js", integrity="sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7", crossorigin="anonymous")
+  //script(src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js")
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.3.7/js/tether.min.js", integrity="sha384-XTs3FgkjiBgo8qjEjBk0tGmf3wPrWtA6coPfQDfFEY8AnYJwjalXCiosYRBIBZX8", crossorigin="anonymous")
+  script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/js/bootstrap.min.js", integrity="sha384-BLiI7JTZm+JWlgKa0M0kGRpJbF2J8q+qreVrKBC47e3K6BW78kGLrCkeRX6I9RoK", crossorigin="anonymous")
+  script(src="https://code.highcharts.com/stock/highstock.js")
+  script(src="https://code.highcharts.com/stock/modules/exporting.js")
+  script(src="public/socket.js")

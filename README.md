@@ -1,5 +1,5 @@
 # Stock Market Chart
-Demo: https://dashboard.heroku.com/apps/frozen-wildwood-43021
+Demo: https://frozen-wildwood-43021.herokuapp.com/
 
 Project and user stories: https://www.freecodecamp.com/challenges/chart-the-stock-market
 

@@ -12,17 +12,6 @@ var url = require('url');
 
 require('dotenv').config();
 
-app.use('/public', express.static(process.cwd() + '/public'));
-app.use('/app', express.static(process.cwd() + '/app'));
-
-app.set('views', path.join(__dirname, 'app/views'));
-app.set('view engine', 'pug');
-
-app.get('/', function(req, res) {
-  res.render("index");
-
-});
-
 var quandlOptions = {
   protocol:  'https',
   hostname: 'www.quandl.com',
@@ -36,6 +25,19 @@ var quandlOptions = {
     
   }
 };
+
+app.use('/public', express.static(process.cwd() + '/public'));
+app.use('/app', express.static(process.cwd() + '/app'));
+
+app.set('views', path.join(__dirname, 'app/views'));
+app.set('view engine', 'pug');
+
+app.get('/', function(req, res) {
+  res.render("index");
+
+});
+
+
 
 app.get('/api/company/:company', function(req, res) {
   quandlOptions.pathname = '/api/v3/datasets/WIKI/' + req.params.company + '.json';

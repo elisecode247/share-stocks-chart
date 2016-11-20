@@ -6,11 +6,9 @@ var io = require('socket.io')(http);
 
 var path = require('path');
 var request = require('request');
-var jsonfile = require('jsonfile');
-
-var file = 'app/companies.json';
 var url = require('url');
 var mongoose = require('mongoose');
+var port = process.env.PORT || 8080;
 
 require('dotenv').config();
 mongoose.connect(process.env.MONGO_URI);
@@ -84,7 +82,7 @@ io.on('connection', function(socket) {
   });
 });
 
-http.listen(process.env.PORT, function() {
+http.listen(port, function() {
   console.log('listening on :' + process.env.PORT);
 });
 

@@ -1,17 +1,13 @@
-var socket = io();
-var chart,
+var socket = io(),
+    chart,
     seriesOptions = [],
     seriesCounter = 0,
     names = [];
 
 $('#search-form').submit(function() {
     var symbol = $('#search-input').val().toUpperCase().trim();
-    if (names.indexOf(symbol) > -1) {
-        alert(symbol + ' is already in the chart.');
-    }
-    else {
+    (names.indexOf(symbol) > -1) ? alert(symbol + ' is already in the chart.') :
         socket.emit('add company', symbol);
-    }
     $('#search-input').val('');
     return false;
 });
@@ -21,7 +17,7 @@ $(document).ready(function() {
 });
 
 socket.on('new', function(data) {
-    names = data.companies;
+    names = data;
     createChartData();
 });
 
@@ -32,7 +28,6 @@ socket.on('add company', function(data) {
     else {
         alert('company not found');
     }
-
 });
 
 socket.on('delete company', function(symbol) {
@@ -40,28 +35,37 @@ socket.on('delete company', function(symbol) {
     var index = seriesOptions.findIndex(function(obj) {
         return obj.name === symbol;
     });
-    seriesOptions.splice(index, 1);
-    chart.series[index].remove();
-    names.splice(names.indexOf(symbol), 1);
+    if (index !== -1) {
+        names.splice(names.indexOf(symbol), 1);
+        seriesOptions.splice(index, 1);
+        chart.series[index].remove();
+    }
+
+
 });
 
-function addCompany(myData) {
-    myData = JSON.parse(myData);
-    var modifiedData = myData.dataset.data.map(function(val) {
-        val[0] = Date.parse(val[0]);
-        return val;
-    });
-    names.push(myData.dataset.dataset_code)
-    seriesOptions[seriesOptions.length] = {
-        name: myData.dataset.dataset_code,
-        data: modifiedData
-    };
-    chart.addSeries(seriesOptions[seriesOptions.length - 1]);
-    createCard(myData.dataset.dataset_code, myData.dataset.name);
+function addCompany(data) {
+    var myData;
+    (typeof data === 'string') ? myData = JSON.parse(myData): myData = data;
+    if (names.indexOf(myData.dataset.dataset_code) === -1) {
+        var modifiedData = myData.dataset.data.map(function(val) {
+            val[0] = Date.parse(val[0]);
+            return val;
+        });
+        names.push(myData.dataset.dataset_code);
+        seriesOptions[seriesOptions.length] = {
+            name: myData.dataset.dataset_code,
+            data: modifiedData
+        };
+        (names.length === 1) ? createChart():
+            chart.addSeries(seriesOptions[seriesOptions.length - 1]);
+        createCard(myData.dataset.dataset_code, myData.dataset.name);
+    }
 }
 
 function createCard(symbol, name) {
-    $('#companies').prepend('<div class="card card-block col-sm-6"><button data-company="' + symbol + '" class="btn btn-sm closeCard"' +
+    $('#companies').prepend('<div class="card card-block col-sm-6">' + 
+        '<button data-company="' + symbol + '" class="btn btn-sm closeCard"' +
         '>X</button><h3>' +
         symbol + '</h3><p>' + name + '</p></div>');
     $('button[data-company="' + symbol + '"]').on("click", function() {
@@ -70,12 +74,11 @@ function createCard(symbol, name) {
 }
 
 
-function createChart(myData) {
+function createChart() {
     chart = Highcharts.StockChart('chart-container', {
         rangeSelector: {
             selected: 1
         },
-
         title: {
             text: 'Closing Stock Prices'
         },
@@ -104,7 +107,7 @@ function createChartData() {
             seriesCounter += 1;
             createCard(myData.dataset.dataset_code, myData.dataset.name);
             if (seriesCounter === names.length) {
-                createChart(name);
+                createChart();
             }
         });
     });

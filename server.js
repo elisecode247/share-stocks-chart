@@ -7,13 +7,20 @@ var io = require('socket.io')(http);
 var path = require('path');
 var request = require('request');
 var jsonfile = require('jsonfile');
+
 var file = 'app/companies.json';
 var url = require('url');
+var mongoose = require('mongoose');
 
 require('dotenv').config();
+mongoose.connect(process.env.MONGO_URI);
+
+var Company = mongoose.model('Company', {
+  companies: Array
+});
 
 var quandlOptions = {
-  protocol:  'https',
+  protocol: 'https',
   hostname: 'www.quandl.com',
   pathname: '/api/v3/datasets/WIKI/',
   query: {
@@ -22,7 +29,7 @@ var quandlOptions = {
     'order': 'asc',
     'column_index': 1,
     'api_key': process.env.API_KEY
-    
+
   }
 };
 
@@ -33,14 +40,13 @@ app.set('views', path.join(__dirname, 'app/views'));
 app.set('view engine', 'pug');
 
 app.get('/', function(req, res) {
-  res.render("index");
+  res.render('index');
 
 });
 
-
-
 app.get('/api/company/:company', function(req, res) {
-  quandlOptions.pathname = '/api/v3/datasets/WIKI/' + req.params.company + '.json';
+  quandlOptions.pathname = '/api/v3/datasets/WIKI/' +
+    req.params.company + '.json';
   var apiUrl = url.format(quandlOptions);
   request(apiUrl, function(error, response, body) {
     if (error) throw error;
@@ -50,9 +56,12 @@ app.get('/api/company/:company', function(req, res) {
 
 io.on('connection', function(socket) {
   socket.on('new', function() {
-    jsonfile.readFile(file, function(err, data) {
-      socket.emit('new', data);
-    });
+    Company.findOne()
+      .exec(function(err, data) {
+        if (err) throw err;
+        socket.emit('new', data.companies);
+      });
+
   });
   socket.on('add company', function(company) {
     quandlOptions.pathname = '/api/v3/datasets/WIKI/' + company + '.json';
@@ -62,7 +71,7 @@ io.on('connection', function(socket) {
       if (response.statusCode === 200) {
         var jsonObj = JSON.parse(body)
         appendObject(jsonObj.dataset.dataset_code)
-        io.emit('add company', body);
+        io.emit('add company', jsonObj);
       }
       else {
         socket.emit('add company', 'error');
@@ -76,35 +85,31 @@ io.on('connection', function(socket) {
 });
 
 http.listen(process.env.PORT, function() {
-  console.log('listening on *:8080');
+  console.log('listening on :' + process.env.PORT);
 });
 
 
 function appendObject(str) {
-  jsonfile.readFile(file, function(err, data) {
-    if (err) throw err;
-    if (data.companies.indexOf(str) !== -1) {
-      data.companies.push(str);
-      jsonfile.writeFile(file, data, function(err) {
-        console.error(err);
-      });
-    }
-  });
+  console.log(str);
+  Company.findOneAndUpdate({}, {
+      $addToSet: {
+        'companies': str
+      }
+    })
+    .exec(function(err, data) {
+      if (err) throw err;
+    });
 }
 
 function pullCompany(str) {
-  jsonfile.readFile(file, function(err, data) {
-    var arr = data.companies;
-    if (err) throw err;
-    var found = arr.indexOf(str);
-    if (found !== -1) {
-      arr.splice(found, 1);
-    }
-    jsonfile.writeFile(file, data, function(err) {
-      console.error(err);
+  Company.findOneAndUpdate({}, {
+      $pull: {
+        'companies': str
+      }
+    })
+    .exec(function(err, data) {
+      if (err) throw err;
     });
-  });
-
 }
 
 function formatDate(days) {

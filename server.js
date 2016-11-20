@@ -10,6 +10,8 @@ var jsonfile = require('jsonfile');
 var file = 'app/companies.json';
 var url = require('url');
 
+require('dotenv').config();
+
 app.use('/public', express.static(process.cwd() + '/public'));
 app.use('/app', express.static(process.cwd() + '/app'));
 

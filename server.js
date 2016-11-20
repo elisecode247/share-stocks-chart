@@ -1,11 +1,14 @@
 var express = require('express');
 var app = express();
+
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+
 var path = require('path');
 var request = require('request');
 var jsonfile = require('jsonfile');
 var file = 'app/companies.json';
+var url = require('url');
 
 app.use('/public', express.static(process.cwd() + '/public'));
 app.use('/app', express.static(process.cwd() + '/app'));
@@ -18,11 +21,23 @@ app.get('/', function(req, res) {
 
 });
 
+var quandlOptions = {
+  protocol:  'https',
+  hostname: 'www.quandl.com',
+  pathname: '/api/v3/datasets/WIKI/',
+  query: {
+    'start_date': formatDate(365),
+    'end_date': formatDate(1),
+    'order': 'asc',
+    'column_index': 1,
+    'api_key': process.env.API_KEY
+    
+  }
+};
+
 app.get('/api/company/:company', function(req, res) {
-  var apiUrl = 'https://www.quandl.com/api/v3/datasets/WIKI/' +
-    req.params.company + '.json?start_date=' + formatDate(365) +
-    '&end_date=' + formatDate(1) +
-    '&order=asc&column_index=1&api_key=B4_x1rzypeW4D7N797RK';
+  quandlOptions.pathname = '/api/v3/datasets/WIKI/' + req.params.company + '.json';
+  var apiUrl = url.format(quandlOptions);
   request(apiUrl, function(error, response, body) {
     if (error) throw error;
     res.json(JSON.parse(body));
@@ -36,10 +51,8 @@ io.on('connection', function(socket) {
     });
   });
   socket.on('add company', function(company) {
-    var apiUrl = 'https://www.quandl.com/api/v3/datasets/WIKI/' +
-      company + '.json?start_date=' + formatDate(365) +
-      '&end_date=' + formatDate(1) +
-      '&order=asc&column_index=1&api_key=B4_x1rzypeW4D7N797RK';
+    quandlOptions.pathname = '/api/v3/datasets/WIKI/' + company + '.json';
+    var apiUrl = url.format(quandlOptions);
     request(apiUrl, function(error, response, body) {
       if (error) throw error;
       if (response.statusCode === 200) {

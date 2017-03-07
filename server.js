@@ -10,7 +10,12 @@ var url = require('url');
 var mongoose = require('mongoose');
 var port = process.env.PORT || 8080;
 
-require('dotenv').config();
+var fs = require('fs');
+
+if (fs.existsSync('.env')){ // for development only
+	require('dotenv').load();
+}
+
 mongoose.connect(process.env.MONGO_URI);
 
 var Company = mongoose.model('Company', {
